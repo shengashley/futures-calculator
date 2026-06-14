@@ -1,6 +1,5 @@
 const products = {
   TX: { pointValue: 200, initialMargin: 578000, maintenanceMargin: 443000, feeOneWay: 80 },
-  MTX: { pointValue: 50, initialMargin: 144500, maintenanceMargin: 110750, feeOneWay: 30 },
   TMF: { pointValue: 10, initialMargin: 28900, maintenanceMargin: 22150, feeOneWay: 10 },
 };
 
@@ -43,6 +42,9 @@ function calculate() {
   const entry = number("entryPrice");
   const exit = number("exitPrice");
   const contracts = Math.max(0, Math.floor(number("contracts")));
+  const stockContracts = Math.max(0, Math.floor(number("stockContracts")));
+  const stockPointValue = number("stockPointValue");
+
   const feeOneWay = number("feeOneWay");
   const accountPrincipal = number("accountPrincipal");
   const initialMargin = number("initialMargin");
@@ -50,21 +52,29 @@ function calculate() {
   const includeTax = $("includeTax").checked;
 
   const diff = direction === "long" ? exit - entry : entry - exit;
-  const grossPnl = diff * p.pointValue * contracts;
-  const totalFee = feeOneWay * 2 * contracts;
-  const tax = includeTax
-    ? (entry * p.pointValue * TAX_RATE * contracts) + (exit * p.pointValue * TAX_RATE * contracts)
-    : 0;
+
+  const mainGrossPnl = diff * p.pointValue * contracts;
+  const stockGrossPnl = diff * stockPointValue * stockContracts;
+  const grossPnl = mainGrossPnl + stockGrossPnl;
+
+  const totalContractsForFee = contracts + stockContracts;
+  const totalFee = feeOneWay * 2 * totalContractsForFee;
+
+  const mainTax = entry * p.pointValue * TAX_RATE * contracts + exit * p.pointValue * TAX_RATE * contracts;
+  const stockTax = entry * stockPointValue * TAX_RATE * stockContracts + exit * stockPointValue * TAX_RATE * stockContracts;
+  const tax = includeTax ? mainTax + stockTax : 0;
 
   const netPnl = grossPnl - totalFee - tax;
   const totalMargin = initialMargin * contracts;
   const roi = totalMargin > 0 ? (netPnl / totalMargin) * 100 : 0;
   const endingAccountPrincipal = accountPrincipal + netPnl;
 
-  const marginGapPoints = (initialMargin - maintenanceMargin) / p.pointValue;
+  const marginGapPoints = p.pointValue > 0 ? (initialMargin - maintenanceMargin) / p.pointValue : 0;
   const marginCallPrice = direction === "long" ? entry - marginGapPoints : entry + marginGapPoints;
   const distance = direction === "long" ? exit - marginCallPrice : marginCallPrice - exit;
 
+  $("mainGrossPnl").textContent = signedMoney(mainGrossPnl);
+  $("stockGrossPnl").textContent = signedMoney(stockGrossPnl);
   $("grossPnl").textContent = signedMoney(grossPnl);
   $("totalFee").textContent = `-${money(totalFee)}`;
   $("tax").textContent = `-${money(tax)}`;
@@ -76,19 +86,15 @@ function calculate() {
   $("marginCallPrice").textContent = plain(marginCallPrice, 2);
   $("distanceToMarginCall").textContent = `${plain(distance, 2)} 點`;
 
-  setColor($("grossPnl"), grossPnl);
-  setColor($("netPnl"), netPnl);
-  setColor($("roi"), roi);
-  setColor($("endingAccountPrincipal"), endingAccountPrincipal - accountPrincipal);
+  [
+    ["mainGrossPnl", mainGrossPnl],
+    ["stockGrossPnl", stockGrossPnl],
+    ["grossPnl", grossPnl],
+    ["netPnl", netPnl],
+    ["roi", roi],
+    ["endingAccountPrincipal", endingAccountPrincipal - accountPrincipal]
+  ].forEach(([id, value]) => setColor($(id), value));
 }
-
-function updatePointTools() {
-  const point10 = number("point10Input");
-  const point100 = number("point100Input");
-  $("point10Result").textContent = `= ${money(point10 * 10)}`;
-  $("point100Result").textContent = `= ${money(point100 * 100)}`;
-}
-
 
 function clearToZero() {
   [
@@ -99,13 +105,12 @@ function clearToZero() {
     "accountPrincipal",
     "initialMargin",
     "maintenanceMargin",
-    "point10Input",
-    "point100Input"
+    "stockContracts"
   ].forEach(id => {
     $(id).value = 0;
   });
 
-  updatePointTools();
+  $("stockPointValue").value = 100;
   calculate();
 }
 
@@ -147,14 +152,12 @@ $("shortBtn").addEventListener("click", () => {
   "accountPrincipal",
   "initialMargin",
   "maintenanceMargin",
-  "includeTax"
+  "includeTax",
+  "stockContracts",
+  "stockPointValue"
 ].forEach(id => {
   $(id).addEventListener("input", calculate);
   $(id).addEventListener("change", calculate);
-});
-
-["point10Input", "point100Input"].forEach(id => {
-  $(id).addEventListener("input", updatePointTools);
 });
 
 $("clearBtn").addEventListener("click", clearToZero);
@@ -162,9 +165,8 @@ $("calculateBtn").addEventListener("click", calculate);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker.register("./sw.js?v=micro-stock-1").catch(() => {});
   });
 }
 
-updatePointTools();
 calculate();

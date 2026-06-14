@@ -14,7 +14,7 @@
       <div class="logo">📈</div>
       <div>
         <h1>台指期損益計算器</h1>
-        <p>支援大台 / 小台 / 微台</p>
+        <p>支援大台 / 微台 / 小型個股</p>
       </div>
     </header>
 
@@ -23,10 +23,9 @@
 
       <label class="field">
         商品
-        <div class="segmented" id="productGroup">
-          <button class="seg-btn" data-product="TX" type="button">大台<br><small>每點 200 元</small></button>
-          <button class="seg-btn" data-product="MTX" type="button">小台<br><small>每點 50 元</small></button>
-          <button class="seg-btn active" data-product="TMF" type="button">微台<br><small>每點 10 元</small></button>
+        <div class="segmented two" id="productGroup">
+          <button class="seg-btn" data-product="TX" type="button">大台 TX<br><small>每點 200 元</small></button>
+          <button class="seg-btn active" data-product="TMF" type="button">微台 TMF<br><small>每點 10 元</small></button>
         </div>
       </label>
 
@@ -39,40 +38,13 @@
       </label>
 
       <div class="grid">
-        <label class="field">
-          進場價
-          <input id="entryPrice" type="number" inputmode="decimal" value="21234" />
-        </label>
-
-        <label class="field">
-          出場價
-          <input id="exitPrice" type="number" inputmode="decimal" value="21300" />
-        </label>
-
-        <label class="field">
-          口數
-          <input id="contracts" type="number" inputmode="numeric" min="1" step="1" value="1" />
-        </label>
-
-        <label class="field">
-          單邊手續費
-          <input id="feeOneWay" type="number" inputmode="decimal" value="10" />
-        </label>
-
-        <label class="field">
-          帳戶本金
-          <input id="accountPrincipal" type="number" inputmode="numeric" value="50000" />
-        </label>
-
-        <label class="field">
-          原始保證金
-          <input id="initialMargin" type="number" inputmode="numeric" value="28900" />
-        </label>
-
-        <label class="field">
-          維持保證金
-          <input id="maintenanceMargin" type="number" inputmode="numeric" value="22150" />
-        </label>
+        <label class="field">進場價<input id="entryPrice" type="number" inputmode="decimal" value="21234" /></label>
+        <label class="field">出場價<input id="exitPrice" type="number" inputmode="decimal" value="21300" /></label>
+        <label class="field">大台 / 微台口數<input id="contracts" type="number" inputmode="numeric" min="0" step="1" value="1" /></label>
+        <label class="field">單邊手續費<input id="feeOneWay" type="number" inputmode="decimal" value="10" /></label>
+        <label class="field">帳戶本金<input id="accountPrincipal" type="number" inputmode="numeric" value="50000" /></label>
+        <label class="field">原始保證金<input id="initialMargin" type="number" inputmode="numeric" value="28900" /></label>
+        <label class="field">維持保證金<input id="maintenanceMargin" type="number" inputmode="numeric" value="22150" /></label>
       </div>
 
       <label class="check-row">
@@ -82,25 +54,16 @@
     </section>
 
     <section class="card">
-      <h2>2. 附加功能</h2>
+      <h2>2. 小型個股參數</h2>
 
-      <div class="extra">
-        <div>
-          <strong>一點 10 元</strong>
-          <p>輸入口數，計算金額</p>
-        </div>
-        <input id="point10Input" type="number" inputmode="numeric" value="100" />
-        <span id="point10Result">= 1,000 元</span>
+      <div class="grid">
+        <label class="field">小型個股口數<input id="stockContracts" type="number" inputmode="numeric" min="0" step="1" value="0" /></label>
+        <label class="field">小型個股每點價值<input id="stockPointValue" type="number" inputmode="numeric" min="0" value="100" /></label>
       </div>
 
-      <div class="extra">
-        <div>
-          <strong>小型個股一點 100 元</strong>
-          <p>輸入口數，計算金額</p>
-        </div>
-        <input id="point100Input" type="number" inputmode="numeric" value="50" />
-        <span id="point100Result">= 5,000 元</span>
-      </div>
+      <p class="hint">
+        小型個股損益會加到總損益中。預設每點價值 100 元，但可以依商品自行修改。
+      </p>
 
       <div class="button-row">
         <button class="secondary" id="clearBtn" type="button">清除歸零</button>
@@ -117,7 +80,9 @@
       </div>
 
       <div class="result-grid">
-        <div><span>毛損益</span><strong id="grossPnl">0 元</strong></div>
+        <div><span>大台 / 微台毛損益</span><strong id="mainGrossPnl">0 元</strong></div>
+        <div><span>小型個股毛損益</span><strong id="stockGrossPnl">0 元</strong></div>
+        <div><span>總毛損益</span><strong id="grossPnl">0 元</strong></div>
         <div><span>手續費</span><strong id="totalFee">0 元</strong></div>
         <div><span>交易稅</span><strong id="tax">0 元</strong></div>
         <div><span>ROI</span><strong id="roi">0%</strong></div>
@@ -129,22 +94,15 @@
 
     <section class="card">
       <h2>追繳資訊</h2>
-      <div class="warning">當價格觸及以下價位，帳戶權益將低於維持保證金，可能會被追繳。</div>
-      <div class="margin-row">
-        <span>追繳價</span>
-        <strong id="marginCallPrice">0</strong>
-      </div>
-      <div class="margin-row">
-        <span>距離追繳價</span>
-        <strong id="distanceToMarginCall">0 點</strong>
-      </div>
+      <div class="warning">追繳價目前依大台 / 微台保證金計算，小型個股不納入追繳價試算。</div>
+      <div class="margin-row"><span>追繳價</span><strong id="marginCallPrice">0</strong></div>
+      <div class="margin-row"><span>距離追繳價</span><strong id="distanceToMarginCall">0 點</strong></div>
     </section>
 
     <footer>
       ※ 保證金會依交易所公告調整，請自行確認。本工具僅供試算，不構成投資建議。
     </footer>
   </main>
-
-  <script src="app.js"></script>
+  <script src="app.js?v=micro-stock-1"></script>
 </body>
 </html>
