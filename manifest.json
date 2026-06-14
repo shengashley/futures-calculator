@@ -1,0 +1,17 @@
+{
+  "name": "台指期損益計算器",
+  "short_name": "期貨計算器",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#eef3f9",
+  "theme_color": "#0b2a4a",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

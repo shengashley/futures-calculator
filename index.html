@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#0b2a4a" />
+  <title>台指期損益計算器</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="logo">📈</div>
+      <div>
+        <h1>台指期損益計算器</h1>
+        <p>支援大台 / 小台 / 微台</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <h2>1. 交易設定</h2>
+
+      <label class="field">
+        商品
+        <div class="segmented" id="productGroup">
+          <button class="seg-btn" data-product="TX" type="button">大台<br><small>每點 200 元</small></button>
+          <button class="seg-btn" data-product="MTX" type="button">小台<br><small>每點 50 元</small></button>
+          <button class="seg-btn active" data-product="TMF" type="button">微台<br><small>每點 10 元</small></button>
+        </div>
+      </label>
+
+      <label class="field">
+        方向
+        <div class="segmented two">
+          <button class="seg-btn active" id="longBtn" type="button">做多（買進）</button>
+          <button class="seg-btn" id="shortBtn" type="button">做空（賣出）</button>
+        </div>
+      </label>
+
+      <div class="grid">
+        <label class="field">
+          進場價
+          <input id="entryPrice" type="number" inputmode="decimal" value="21234" />
+        </label>
+
+        <label class="field">
+          出場價
+          <input id="exitPrice" type="number" inputmode="decimal" value="21300" />
+        </label>
+
+        <label class="field">
+          口數
+          <input id="contracts" type="number" inputmode="numeric" min="1" step="1" value="1" />
+        </label>
+
+        <label class="field">
+          單邊手續費
+          <input id="feeOneWay" type="number" inputmode="decimal" value="10" />
+        </label>
+
+        <label class="field">
+          帳戶本金
+          <input id="accountPrincipal" type="number" inputmode="numeric" value="50000" />
+        </label>
+
+        <label class="field">
+          原始保證金
+          <input id="initialMargin" type="number" inputmode="numeric" value="28900" />
+        </label>
+
+        <label class="field">
+          維持保證金
+          <input id="maintenanceMargin" type="number" inputmode="numeric" value="22150" />
+        </label>
+      </div>
+
+      <label class="check-row">
+        <span>是否計算交易稅</span>
+        <input id="includeTax" type="checkbox" checked />
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>2. 附加功能</h2>
+
+      <div class="extra">
+        <div>
+          <strong>一點 10 元</strong>
+          <p>輸入口數，計算金額</p>
+        </div>
+        <input id="point10Input" type="number" inputmode="numeric" value="100" />
+        <span id="point10Result">= 1,000 元</span>
+      </div>
+
+      <div class="extra">
+        <div>
+          <strong>小型個股一點 100 元</strong>
+          <p>輸入口數，計算金額</p>
+        </div>
+        <input id="point100Input" type="number" inputmode="numeric" value="50" />
+        <span id="point100Result">= 5,000 元</span>
+      </div>
+
+      <button class="primary" id="calculateBtn" type="button">計算</button>
+    </section>
+
+    <section class="card result-card">
+      <h2>計算結果</h2>
+
+      <div class="big-result">
+        <span>淨損益</span>
+        <strong id="netPnl">0 元</strong>
+      </div>
+
+      <div class="result-grid">
+        <div><span>毛損益</span><strong id="grossPnl">0 元</strong></div>
+        <div><span>手續費</span><strong id="totalFee">0 元</strong></div>
+        <div><span>交易稅</span><strong id="tax">0 元</strong></div>
+        <div><span>ROI</span><strong id="roi">0%</strong></div>
+        <div><span>保證金需求</span><strong id="totalMargin">0 元</strong></div>
+        <div><span>帳戶本金</span><strong id="accountPrincipalResult">0 元</strong></div>
+        <div><span>交易後帳戶本金</span><strong id="endingAccountPrincipal">0 元</strong></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>追繳資訊</h2>
+      <div class="warning">當價格觸及以下價位，帳戶權益將低於維持保證金，可能會被追繳。</div>
+      <div class="margin-row">
+        <span>追繳價</span>
+        <strong id="marginCallPrice">0</strong>
+      </div>
+      <div class="margin-row">
+        <span>距離追繳價</span>
+        <strong id="distanceToMarginCall">0 點</strong>
+      </div>
+    </section>
+
+    <footer>
+      ※ 保證金會依交易所公告調整，請自行確認。本工具僅供試算，不構成投資建議。
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
