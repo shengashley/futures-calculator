@@ -42,7 +42,7 @@ function calculate() {
 
   const entry = number("entryPrice");
   const exit = number("exitPrice");
-  const contracts = Math.max(1, Math.floor(number("contracts")));
+  const contracts = Math.max(0, Math.floor(number("contracts")));
   const feeOneWay = number("feeOneWay");
   const accountPrincipal = number("accountPrincipal");
   const initialMargin = number("initialMargin");
@@ -87,6 +87,26 @@ function updatePointTools() {
   const point100 = number("point100Input");
   $("point10Result").textContent = `= ${money(point10 * 10)}`;
   $("point100Result").textContent = `= ${money(point100 * 100)}`;
+}
+
+
+function clearToZero() {
+  [
+    "entryPrice",
+    "exitPrice",
+    "contracts",
+    "feeOneWay",
+    "accountPrincipal",
+    "initialMargin",
+    "maintenanceMargin",
+    "point10Input",
+    "point100Input"
+  ].forEach(id => {
+    $(id).value = 0;
+  });
+
+  updatePointTools();
+  calculate();
 }
 
 function setProduct(product) {
@@ -137,6 +157,7 @@ $("shortBtn").addEventListener("click", () => {
   $(id).addEventListener("input", updatePointTools);
 });
 
+$("clearBtn").addEventListener("click", clearToZero);
 $("calculateBtn").addEventListener("click", calculate);
 
 if ("serviceWorker" in navigator) {

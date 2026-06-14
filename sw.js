@@ -1,4 +1,4 @@
-const CACHE_NAME = "futures-calculator-v1-first";
+const CACHE_NAME = "futures-calculator-v1-clear";
 const ASSETS = ["./", "./index.html", "./style.css", "./app.js", "./manifest.json", "./icon.svg"];
 
 self.addEventListener("install", event => {

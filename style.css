@@ -176,16 +176,31 @@ input:focus {
   font-size: 13px;
 }
 
-.primary {
+.button-row {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.primary,
+.secondary {
   width: 100%;
   min-height: 50px;
-  margin-top: 8px;
   border: 0;
   border-radius: 12px;
-  background: var(--blue);
-  color: white;
   font-size: 17px;
   font-weight: 900;
+}
+
+.primary {
+  background: var(--blue);
+  color: white;
+}
+
+.secondary {
+  background: #e5eaf2;
+  color: var(--text);
 }
 
 .big-result {

@@ -15,3 +15,6 @@
 1. 上傳到 GitHub Pages / Cloudflare Pages / Netlify / Vercel
 2. 用 iPhone Safari 開啟
 3. 分享 → 加入主畫面
+
+
+本版新增：清除歸零按鍵。
