@@ -1,5 +1,6 @@
 const products = {
   TX: { pointValue: 200, initialMargin: 578000, maintenanceMargin: 443000, feeOneWay: 80 },
+  MTX: { pointValue: 50, initialMargin: 144500, maintenanceMargin: 110750, feeOneWay: 30 },
   TMF: { pointValue: 10, initialMargin: 28900, maintenanceMargin: 22150, feeOneWay: 10 },
 };
 
@@ -41,8 +42,8 @@ function calculate() {
 
   const entry = number("entryPrice");
   const exit = number("exitPrice");
-  const contracts = Math.max(0, Math.floor(number("contracts")));
-  const stockContracts = Math.max(0, Math.floor(number("stockContracts")));
+  const futuresContracts = Math.max(0, Math.floor(number("futuresContracts")));
+  const stockLots = Math.max(0, Math.floor(number("stockLots")));
   const stockPointValue = number("stockPointValue");
 
   const feeOneWay = number("feeOneWay");
@@ -53,19 +54,18 @@ function calculate() {
 
   const diff = direction === "long" ? exit - entry : entry - exit;
 
-  const mainGrossPnl = diff * p.pointValue * contracts;
-  const stockGrossPnl = diff * stockPointValue * stockContracts;
-  const grossPnl = mainGrossPnl + stockGrossPnl;
+  const futuresPnl = diff * p.pointValue * futuresContracts;
+  const stockPnl = diff * stockPointValue * stockLots;
+  const grossPnl = futuresPnl + stockPnl;
 
-  const totalContractsForFee = contracts + stockContracts;
-  const totalFee = feeOneWay * 2 * totalContractsForFee;
+  const totalFee = feeOneWay * 2 * (futuresContracts + stockLots);
 
-  const mainTax = entry * p.pointValue * TAX_RATE * contracts + exit * p.pointValue * TAX_RATE * contracts;
-  const stockTax = entry * stockPointValue * TAX_RATE * stockContracts + exit * stockPointValue * TAX_RATE * stockContracts;
-  const tax = includeTax ? mainTax + stockTax : 0;
+  const futuresTax = entry * p.pointValue * TAX_RATE * futuresContracts + exit * p.pointValue * TAX_RATE * futuresContracts;
+  const stockTax = entry * stockPointValue * TAX_RATE * stockLots + exit * stockPointValue * TAX_RATE * stockLots;
+  const tax = includeTax ? futuresTax + stockTax : 0;
 
   const netPnl = grossPnl - totalFee - tax;
-  const totalMargin = initialMargin * contracts;
+  const totalMargin = initialMargin * futuresContracts;
   const roi = totalMargin > 0 ? (netPnl / totalMargin) * 100 : 0;
   const endingAccountPrincipal = accountPrincipal + netPnl;
 
@@ -73,8 +73,8 @@ function calculate() {
   const marginCallPrice = direction === "long" ? entry - marginGapPoints : entry + marginGapPoints;
   const distance = direction === "long" ? exit - marginCallPrice : marginCallPrice - exit;
 
-  $("mainGrossPnl").textContent = signedMoney(mainGrossPnl);
-  $("stockGrossPnl").textContent = signedMoney(stockGrossPnl);
+  $("futuresPnl").textContent = signedMoney(futuresPnl);
+  $("stockPnl").textContent = signedMoney(stockPnl);
   $("grossPnl").textContent = signedMoney(grossPnl);
   $("totalFee").textContent = `-${money(totalFee)}`;
   $("tax").textContent = `-${money(tax)}`;
@@ -87,8 +87,8 @@ function calculate() {
   $("distanceToMarginCall").textContent = `${plain(distance, 2)} 點`;
 
   [
-    ["mainGrossPnl", mainGrossPnl],
-    ["stockGrossPnl", stockGrossPnl],
+    ["futuresPnl", futuresPnl],
+    ["stockPnl", stockPnl],
     ["grossPnl", grossPnl],
     ["netPnl", netPnl],
     ["roi", roi],
@@ -100,12 +100,10 @@ function clearToZero() {
   [
     "entryPrice",
     "exitPrice",
-    "contracts",
+    "futuresContracts",
+    "stockLots",
     "feeOneWay",
-    "accountPrincipal",
-    "initialMargin",
-    "maintenanceMargin",
-    "stockContracts"
+    "accountPrincipal"
   ].forEach(id => {
     $(id).value = 0;
   });
@@ -147,14 +145,14 @@ $("shortBtn").addEventListener("click", () => {
 [
   "entryPrice",
   "exitPrice",
-  "contracts",
+  "futuresContracts",
+  "stockLots",
+  "stockPointValue",
   "feeOneWay",
   "accountPrincipal",
   "initialMargin",
   "maintenanceMargin",
-  "includeTax",
-  "stockContracts",
-  "stockPointValue"
+  "includeTax"
 ].forEach(id => {
   $(id).addEventListener("input", calculate);
   $(id).addEventListener("change", calculate);
@@ -165,7 +163,7 @@ $("calculateBtn").addEventListener("click", calculate);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js?v=micro-stock-1").catch(() => {});
+    navigator.serviceWorker.register("./sw.js?v=v1-1-stock").catch(() => {});
   });
 }
 
